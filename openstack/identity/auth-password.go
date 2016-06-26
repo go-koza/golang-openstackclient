@@ -2,8 +2,9 @@ package identity
 
 import (
     "errors"
+    "fmt"
 
-    "github.com/go-koza/golang-openstackclient/openstack/utils"
+    "github.com/parnurzeal/gorequest"
 )
 
 type Credentials struct {
@@ -26,11 +27,11 @@ func newAuthCreds (creds *Creds) (authCreds AuthCreds, err error) {
     err = nil
     authCreds = AuthCreds{
         Auth: Auth{
-        Credentials:    Credentials{
-            Username:   creds.Username,
-            Password:   creds.Password,
-        },
-        Project:    creds.Project,
+            Credentials:    Credentials{
+                Username:   creds.Username,
+                Password:   creds.Password,
+            },
+            Project:    creds.Project,
         },
     }
 
@@ -46,9 +47,16 @@ func (creds *Creds) getToken (url string) (IdentityIFace, error) {
         return nil, err
     }
 
-    err = utils.PostJSON(url + "/tokens", &authCreds, &token)
-    if err != nil {
-        return nil, err
+    request := gorequest.New()
+    resp, _, errs := request.Post(url + "/tokens").
+            Send(authCreds).
+            EndStruct(&token)
+
+    fmt.Println(request)
+    fmt.Println(resp)
+    if errs != nil {
+        fmt.Println(resp.Status)
+        //return nil, errs
     }
 
     return &token, nil

@@ -2,3 +2,12 @@ language: go
 
 go:
     - tip
+
+install:
+    - go get github.com/parnurzeal/gorequest
+
+notifications:
+    email:
+        recipients: ckmvishnu@gmail.com
+        on_success: change
+        on_failure: always
